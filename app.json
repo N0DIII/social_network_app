@@ -1,27 +1,33 @@
 {
-    "expo": {
-        "name": "social_network_app",
-        "slug": "social_network_app",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "dark",
-        "splash": {
-            "image": "./assets/splash.png",
-            "resizeMode": "cover",
-            "backgroundColor": "#191C24"
-        },
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#191C24"
-            }
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        }
+  "expo": {
+    "name": "social_network_app",
+    "slug": "social_network_app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#191C24"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#191C24"
+      },
+      "package": "com.n0_zero.social_network_app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e65103b2-6c89-4a2a-9769-6fbcc8be7c99"
+      }
     }
+  }
 }

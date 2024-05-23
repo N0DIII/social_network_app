@@ -19,8 +19,7 @@ export default function Button(props) {
 const styles = StyleSheet.create({
     wrapper: {
         height: 45,
-        overflow: 'hidden',
-        borderRadius: 20,
+        width: '100%',
     },
 
     background: {
@@ -43,6 +42,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        borderRadius: 20,
+        overflow: 'hidden',
     },
 
     buttonPressed: {
