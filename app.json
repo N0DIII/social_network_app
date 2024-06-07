@@ -3,7 +3,7 @@
     "name": "social_network_app",
     "slug": "social_network_app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "all",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
@@ -28,6 +28,15 @@
       "eas": {
         "projectId": "e65103b2-6c89-4a2a-9769-6fbcc8be7c99"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      "expo-video"
+    ]
   }
 }

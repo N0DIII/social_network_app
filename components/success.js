@@ -3,39 +3,39 @@ import { StyleSheet, View, Text, Image, Pressable } from 'react-native';
 
 import { Context } from '../components/context';
 
-export default function Error() {
-    const { error, setError } = useContext(Context);
+export default function Success() {
+    const { success, setSuccess } = useContext(Context);
 
     const timer = useRef(null);
 
     useEffect(() => {
-        if(!error[0]) return;
+        if(!success[0]) return;
         if(timer.current) clearTimeout(timer.current);
 
         timer.current = setTimeout(() => {
-            setError([false, '']);
+            setSuccess([false, '']);
         }, 5000)
-    }, [error])
+    }, [success])
 
     function close() {
         clearTimeout(timer.current);
-        setError([false, '']);
+        setSuccess([false, '']);
     }
 
-    if(error[0]) {
+    if(success[0]) {
         return(
-            <View style={styles.error_wrapper}>
+            <View style={styles.wrapper}>
                 <Pressable style={styles.cross_wrapper} onPress={close}>
                     <Image style={styles.cross} source={require('../assets/cross.png')} />
                 </Pressable>
-                <Text style={styles.text}>{error[1]}</Text>
+                <Text style={styles.text}>{success[1]}</Text>
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    error_wrapper: {
+    wrapper: {
         position: 'absolute',
         alignSelf: 'center',
         bottom: 20,
@@ -44,8 +44,6 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden',
         backgroundColor: '#26282E',
-        borderColor: 'red',
-        borderWidth: 0.5,
     },
 
     text: {

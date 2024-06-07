@@ -1,15 +1,20 @@
-import { StyleSheet, TextInput, Image } from 'react-native';
+import { StyleSheet, TextInput, Image, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
 export default function Search(props) {
-    const { setValue } = props;
+    const { setValue, icon = false, onClick = () => {}, asset = 'plus' } = props;
 
     return(
         <BlurView style={styles.blurView} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
             <SafeAreaView style={styles.wrapper}>
                 <Image style={styles.icon} source={require('../assets/search.png')} />
                 <TextInput style={styles.input} placeholder='Введите запрос' onChangeText={setValue} placeholderTextColor='#949AAF' />
+                {icon &&
+                <Pressable onPress={onClick}>
+                    {asset == 'plus' && <Image style={styles.icon} source={require(`../assets/plus.png`)} />}
+                    {asset == 'back' && <Image style={styles.icon} source={require(`../assets/leftArrow1.png`)} />}
+                </Pressable>}
             </SafeAreaView>
         </BlurView>
     )
@@ -41,6 +46,6 @@ const styles = StyleSheet.create({
     input: {
         fontSize: 18,
         color: 'white',
-        width: '80%',
+        width: '70%',
     }
 })

@@ -18,9 +18,9 @@ export default function Login({ navigation }) {
     const [password, setPassword] = useState('');
 
     function sign() {
-        server('/auth/login', { username, password })
+        server('/login', { username, password })
         .then(result => {
-            if(result.error) setError([true, result.message]);
+            if(result.error || result?.field != undefined) setError([true, result.message]);
             else {
                 AsyncStorage.setItem('token', result.token);
                 auth(result.token).then(result => {

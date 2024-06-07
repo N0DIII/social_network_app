@@ -6,12 +6,14 @@ import auth from '../scripts/auth';
 
 import Background from '../components/background';
 import { Context } from '../components/context';
+import Button from '../components/button';
 
 export default function Loading({ navigation }) {
-    const { setUserData } = useContext(Context);
+    const { setUserData, socket } = useContext(Context);
 
     const timer = useRef(null);
     const [load, setLoad] = useState({ left: '-20%' });
+    const [error, setError] = useState(false);
 
     useEffect(() => {
         getToken().then(token => {
@@ -21,8 +23,12 @@ export default function Loading({ navigation }) {
                     if(result._id == undefined) navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
                     else {
                         setUserData(result);
+                        socket.emit('online', { id: result._id });
                         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
                     }
+                })
+                .catch(e => {
+                    setError(true);
                 })
             }
         })
@@ -45,14 +51,26 @@ export default function Loading({ navigation }) {
         return AsyncStorage.getItem('token');
     }
 
+    function reload() {
+        navigation.reset({ index: 0, routes: [{ name: 'Loading' }] });
+    }
+
     return(
         <View style={styles.screen}>
             <Background />
 
             <Image style={styles.image} source={require('../assets/comments.png')} />
+
+            {!error && 
             <View style={styles.loading}>
                 <View style={[styles.loading_block, load]}></View>
-            </View>
+            </View>}
+
+            {error &&
+            <View style={styles.error_wrapper}>
+                <Text style={styles.error}>Ошибка подключения к серверу</Text>
+                <Button title='Попробовать снова' onClick={reload} />
+            </View>}
         </View>
     )
 }
@@ -71,7 +89,7 @@ const styles = StyleSheet.create({
     loading: {
         width: '80%',
         height: 10,
-        marginTop: 20,
+        marginTop: 40,
         overflow: 'hidden',
     },
 
@@ -81,5 +99,16 @@ const styles = StyleSheet.create({
         height: 10,
         backgroundColor: '#4753FF',
         borderRadius: 20,
+    },
+
+    error_wrapper: {
+        alignItems: 'center',
+        gap: 10,
+        marginTop: 20,
+    },
+
+    error: {
+        color: 'red',
+        fontSize: 24,
     }
 })

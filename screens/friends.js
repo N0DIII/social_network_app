@@ -1,29 +1,15 @@
-import { useState, useContext } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { server } from '../scripts/server';
+import FriendsList from './friends_list';
+import UserProfile from './user_profile';
 
-import { Context } from '../components/context';
-import Background from '../components/background';
+const Stack = createNativeStackNavigator();
 
-export default function Friends({ navigation }) {
-    const { userData, setError } = useContext(Context);
-
+export default function Friends() {
     return(
-        <View style={styles.screen}>
-            <Background />
-
-            <Text>Friends</Text>
-        </View>
+        <Stack.Navigator initialRouteName='friends_list' screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Screen name='friends_list' component={FriendsList} />
+            <Stack.Screen name='user_profile' component={UserProfile} />
+        </Stack.Navigator>
     )
 }
-
-const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    
-})

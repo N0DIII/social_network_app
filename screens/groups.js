@@ -1,29 +1,15 @@
-import { useState, useContext } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { server } from '../scripts/server';
+import GroupList from './group_list';
+import GroupProfile from './group_profile';
 
-import { Context } from '../components/context';
-import Background from '../components/background';
+const Stack = createNativeStackNavigator();
 
-export default function Groups({ navigation }) {
-    const { userData, setError } = useContext(Context);
-
+export default function Groups() {
     return(
-        <View style={styles.screen}>
-            <Background />
-
-            <Text>Groups</Text>
-        </View>
+        <Stack.Navigator initialRouteName='group_list' screenOptions={{ headerShown: false, animation: 'none' }}>
+            <Stack.Screen name='group_list' component={GroupList} />
+            <Stack.Screen name='group_profile' component={GroupProfile} />
+        </Stack.Navigator>
     )
 }
-
-const styles = StyleSheet.create({
-    screen: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-    
-})

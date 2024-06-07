@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import { server } from '../scripts/server';
+import { serverFile } from '../scripts/server';
 import auth from '../scripts/auth';
 
 import { Context } from '../components/context';
@@ -10,18 +10,21 @@ import Background from '../components/background';
 import Input from '../components/input';
 import InputPassword from '../components/inputPassword';
 import Button from '../components/button';
+import LoadAvatar from '../components/load_avatar';
 
 export default function Registration({ navigation }) {
     const { setUserData, setError } = useContext(Context);
 
+    const [avatar, setAvatar] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
 
     function reg() {
-        server('/auth/registration', { username, password, repeatPassword })
+        serverFile('/registration', { username, password, repeatPassword }, [avatar])
         .then(result => {
-            if(result.error) setError([true, result.message]);
+            if(result.errors) setError([true, result.errors[0].message]);
+            else if(result.error) setError([true, result.message]);
             else {
                 AsyncStorage.setItem('token', result.token);
                 auth(result.token).then(result => {
@@ -38,6 +41,7 @@ export default function Registration({ navigation }) {
 
             <View style={styles.form_wrapper}>
                 <Text style={styles.title}>Регистрация</Text>
+                <LoadAvatar value={require('../assets/defaultAvatar.png')} setValue={setAvatar} />
                 <Input value={username} setValue={setUsername} placeholder='Имя пользователя' />
                 <InputPassword value={password} setValue={setPassword} placeholder='Пароль' />
                 <InputPassword value={repeatPassword} setValue={setRepeatPassword} placeholder='Повторите пароль' />

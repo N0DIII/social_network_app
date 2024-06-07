@@ -1,7 +1,7 @@
 import { StyleSheet, Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import Profile from './profile';
+import MyProfile from './my_profile';
 import Chats from './chats';
 import Friends from './friends';
 import Groups from './groups';
@@ -10,7 +10,6 @@ import Posts from './posts';
 const Tab = createBottomTabNavigator();
 
 export default function Main() {
-
     function tabIcon(name) {
         if(name == 'Posts') return <Image style={styles.icon} source={require('../assets/home.png')} />
         if(name == 'Groups') return <Image style={styles.icon} source={require('../assets/groups.png')} />
@@ -25,7 +24,7 @@ export default function Main() {
             <Tab.Screen name='Группы' component={Groups} options={{ tabBarIcon: () => tabIcon('Groups') }} />
             <Tab.Screen name='Чаты' component={Chats} options={{ tabBarIcon: () => tabIcon('Chats') }} />
             <Tab.Screen name='Друзья' component={Friends} options={{ tabBarIcon: () => tabIcon('Friends') }} />
-            <Tab.Screen name='Профиль' component={Profile} options={{ tabBarIcon: () => tabIcon('Profile') }} />
+            <Tab.Screen name='Профиль' component={MyProfile} options={{ tabBarIcon: () => tabIcon('Profile') }} />
         </Tab.Navigator>
     )
 }
