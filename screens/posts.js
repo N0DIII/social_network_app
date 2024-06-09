@@ -7,12 +7,15 @@ import { Context } from '../components/context';
 import Background from '../components/background';
 import Search from '../components/search';
 import Post from '../components/post';
+import Comments from '../components/comments';
 
 export default function Posts({ navigation }) {
     const { userData, setError } = useContext(Context);
 
     const [search, setSearch] = useState('');
     const [posts, setPosts] = useState(null);
+    const [showComments, setShowComments] = useState(false);
+    const [postId, setPostId] = useState();
 
     const [count, setCount] = useState(0);
     const [maxCount, setMaxCount] = useState(1);
@@ -69,7 +72,7 @@ export default function Posts({ navigation }) {
                 keyExtractor={item => item._id}
                 refreshing={refresh}
                 onRefresh={refreshing}
-                renderItem={({ item }) => <Post post={item} navigation={navigation} />}
+                renderItem={({ item }) => <Post post={item} setShowComments={setShowComments} setPostId={setPostId} />}
                 ListEmptyComponent={() => <View style={{ alignItems: 'center', marginVertical: 50 }}><Text style={{ color: '#949AAF', fontStyle: 'italic', fontSize: 18 }}>Нет результатов</Text></View>}
                 onEndReachedThreshold={0.25}
                 onEndReached={scroll}
@@ -77,6 +80,11 @@ export default function Posts({ navigation }) {
             
             <Search setValue={setSearch} />
 
+            {showComments &&
+            <Comments
+                close={() => setShowComments(false)}
+                postId={postId}
+            />}
         </View>
     )
 }

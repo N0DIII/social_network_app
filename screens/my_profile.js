@@ -44,6 +44,8 @@ export default function MyProfile({ navigation }) {
             else setAlbums(result.albums);
         })
         .catch(e => setError([true, 'Произошла ошибка']));
+
+        console.log(userData)
     }
 
     useEffect(() => {

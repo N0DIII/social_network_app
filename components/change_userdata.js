@@ -102,5 +102,5 @@ const styles = StyleSheet.create({
 
     block: {
         marginVertical: 8,
-    },
+    }
 })

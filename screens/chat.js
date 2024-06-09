@@ -1,13 +1,17 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { StyleSheet, FlatList, View, Text } from 'react-native';
+import { StyleSheet, FlatList, View, Text, Image, Pressable, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 
 import { server, serverFile } from '../scripts/server';
 import serverUrl from '../scripts/server_url';
 
 import { Context } from '../components/context';
 import Background from '../components/background';
-import NewMessage from '../components/new_message';
+import ImageInput from '../components/image_input';
+import Message from '../components/message';
+import TimeAgo from '../components/timeago';
+import ChatMenu from '../components/chat_menu';
 
 export default function Chat({ route }) {
     const { id } = route.params;
@@ -16,12 +20,9 @@ export default function Chat({ route }) {
     const [chat, setChat] = useState(null);
     const [messages, setMessages] = useState(null);
     const [newMessage, setNewMessage] = useState('');
-    const [isEdit, setIsEdit] = useState(false);
-    const [editedMessage, setEditedMessage] = useState();
-    const [showChatMenu, setShowChatMenu] = useState({left: '100vw'});
-    const [showFullscreenImage, setShowFullscreenImage] = useState(false);
-    const [selectImage, setSelectImage] = useState();
-    const [showInvite, setShowInvite] = useState(false);
+    const [newFiles, setNewFiles] = useState([]);
+    const [showFiles, setShowFiles] = useState(false);
+    const [showMenu, setShowMenu] = useState(false);
 
     const [count, setCount] = useState(0);
     const [maxCount, setMaxCount] = useState(1);
@@ -29,55 +30,69 @@ export default function Chat({ route }) {
 
     useEffect(() => {
         setNewMessage('');
-        getChat(id);
         setCount(0);
         setMaxCount(1);
         setFetching(true);
-    }, [userData, id])
 
-    useEffect(() => {
+        socket.emit('joinChat', { chatId: id });
+
+        socket.emit('getChat', { senderId: userData._id, chatId: id });
+        socket.on('getChat', chat => {
+            setChat(chat);
+            socket.off('getChat');
+        })
+
         socket.on('getMessage', message => {
-            if(id == message.chat) {
-                setMessages([message, ...messages]);
-                socket.emit('readChat', { chatID: id, userID: userData._id });
-            }
+            setMessages(prevState => [message, ...prevState]);
+            getChatFiles();
         })
 
-        socket.on('deleteMessage', ({ id }) => {
-            setMessages(messages.filter(message => message._id != id));
+        socket.on('changeMessage', message => {
+            setMessages(prevState => prevState.map(item => {
+                if(item._id == message._id) return message;
+                else return item;
+            }))
         })
 
-        socket.on('editMessage', editedMessage => {
-            let updMessages = messages;
-            for(let i = 0; i < messages.length; i++) {
-                if(messages[i]._id == editedMessage._id) {
-                    updMessages.splice(i, 1, editedMessage);
-                    break;
-                }
-            }
-
-            setMessages([...updMessages]);
+        socket.on('deleteMessage', id => {
+            setMessages(prevState => prevState.filter(item => item._id != id));
         })
 
         return () => {
             socket.off('getMessage');
+            socket.off('changeMessage');
             socket.off('deleteMessage');
-            socket.off('editMessage');
         }
-    }, [messages, id])
+    }, [id])
+
+    useEffect(() => {
+        if(chat == null || chat.type == 'public') return;
+
+        socket.on('userOnline', id => { 
+            if(chat.user._id == id) setChat(prevState => { return { ...prevState, user: { ...prevState.user, online: true } } });
+        })
+
+        socket.on('userOffline', id => { 
+            if(chat.user._id == id) setChat(prevState => { return { ...prevState, user: { ...prevState.user, online: false, last_online: new Date() } } });
+        })
+
+        return () => {
+            socket.off('userOnline');
+            socket.off('userOffline');
+        }
+    }, [chat])
 
     useEffect(() => {
         if(fetching) {
-            server('/chat/getMessages', { chatID: id, count })
+            server('/getMessages', { chatId: id, count })
             .then(result => {
                 if(count != 0) setMessages([...messages, ...result.messages]);
                 else setMessages(result.messages);
 
                 setCount(prevState => prevState + 1);
                 setMaxCount(result.maxCount);
+                setFetching(false);
             })
-
-            setFetching(false);
         }
     }, [fetching])
 
@@ -89,62 +104,72 @@ export default function Chat({ route }) {
         }
     }, [maxCount, messages])
 
-    function getChat(id) {
-        server('/chat/getChat', { chatID: id, userID: userData._id })
-        .then(result => {
-            if(!result.error) {
-                setChat(result);
-                socket.emit('readChat', { chatID: id, userID: userData._id });
-            }
-            else setError([true, result.message]);
-        })
-    }
-
     function sendMessage() {
-        if(newMessage.trim() == '') return;
+        if(newMessage.trim() == '' && newFiles.length == 0) return;
 
-        if(!isEdit) socket.emit('sendMessage', { user: userData._id, chat: id, text: newMessage });
-        else {
-            socket.emit('editMessage', { text: newMessage, message: editedMessage, chat: id });
-            setIsEdit(false);
-        }
-
-        setNewMessage('');
-    }
-
-    function sendFile(e, close, url) {
-        close(false);
-
-        if(e.target.files && e.target.files[0]) {
-            serverFile('/chat/' + url, { user: userData._id, chat: id }, [e.target.files[0]])
-            .then(result => {
-                if(result.error) setError([true, result.message]);
-                else socket.emit('sendFile', result);
-            })
-        }
-    }
-
-    function deleteMessage(message, filename) {
-        socket.emit('deleteMessage', { message, chat: id, filename });
-    }
-
-    function editMessage(id, text) {
-        setIsEdit(true);
-        setEditedMessage(id);
-        setNewMessage(text);
+        serverFile('/createMessage', { senderId: userData._id, chatId: id, text: newMessage }, newFiles)
+        .then(result => {
+            if(result.error) setError([true, result.message]);
+            else {
+                socket.emit('sendMessage', { messageId: result.id, chatId: id });
+                setNewMessage('');
+                setShowFiles(false);
+                setNewFiles([]);
+            }
+        })
     }
 
     return(
         <SafeAreaView style={styles.screen}>
             <Background />
 
-            <NewMessage
-                value={newMessage}
-                setValue={setNewMessage}
-                sendMessage={sendMessage}
-                sendFile={sendFile}
-                placeholder='Новое сообщение'
+            <FlatList
+                contentContainerStyle={{ paddingVertical: 50 }}
+                inverted={true}
+                data={messages}
+                keyExtractor={item => item._id}
+                renderItem={({ item }) => <Message message={item} chatId={id} />}
+                ListEmptyComponent={() => <View style={{ alignItems: 'center', marginVertical: 50 }}><Text style={{ color: '#949AAF', fontStyle: 'italic', fontSize: 18 }}>Нет сообщений</Text></View>}
+                onStartReachedThreshold={0.25}
+                onStartReached={scroll}
             />
+
+            {chat != null &&
+            <BlurView style={styles.header} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+                {chat.type == 'personal' &&
+                <View style={styles.info}>
+                    <Image style={styles.avatar} source={{ uri: `${serverUrl}/users/${chat.user._id}/avatar/${chat.user.avatar}` }} />
+                    <Text style={[styles.name, { position: 'absolute', left: 45, top: 5 }]}>{chat.user.username}</Text>
+                    <TimeAgo style={styles.time} date={chat.user.last_online} />
+                </View>}
+
+                {chat.type == 'public' &&
+                <View style={styles.info}>
+                    <Image style={styles.avatar} source={{ uri: `${serverUrl}/chats/${chat._id}/avatar/${chat.avatar}` }} />
+                    <Text style={styles.name}>{chat.name}</Text>
+                </View>}
+
+                <Pressable onPress={() => setShowMenu(true)}>
+                    <Image style={styles.icon} source={require('../assets/menu.png')} />
+                </Pressable>
+            </BlurView>}
+
+            <BlurView style={styles.newMessage} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+                <Pressable onPress={() => setShowFiles(!showFiles)}>
+                    <Image style={styles.icon} source={require('../assets/clip.png')} />
+                </Pressable>
+                <TextInput style={styles.input} value={newMessage} onChangeText={setNewMessage} placeholder='Новое сообщение' placeholderTextColor='#949AAF' />
+                <Pressable onPress={sendMessage}>
+                    <Image style={styles.icon} source={require('../assets/send.png')} />
+                </Pressable>
+            </BlurView>
+
+            {showFiles &&
+            <BlurView style={styles.files} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+                <ImageInput setValue={setNewFiles} />
+            </BlurView>}
+
+            {showMenu && <ChatMenu chatId={id} close={() => setShowMenu(false)} />}
         </SafeAreaView>
     )
 }
@@ -154,5 +179,74 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
-    
+    header: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: 90,
+        paddingTop: 45,
+        paddingHorizontal: 5,
+    },
+
+    info: {
+        position: 'relative',
+        height: 50,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+    },
+
+    avatar: {
+        width: 40,
+        height: 40,
+        resizeMode: 'cover',
+        borderRadius: 200,
+    },
+
+    name: {
+        color: 'white',
+        fontSize: 18,
+    },
+
+    time: {
+        color: '#949AAF',
+        position: 'absolute',
+        bottom: 5,
+        left: 45,
+    },
+
+    icon: {
+        width: 30,
+        height: 30,
+        resizeMode: 'contain',
+    },
+
+    newMessage: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: 45,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 10,
+        paddingHorizontal: 10,
+    },
+
+    input: {
+        width: '75%',
+        height: 45,
+        fontSize: 16,
+        color: 'white',
+    },
+
+    files: {
+        position: 'absolute',
+        bottom: 45,
+        width: '100%',
+    }
 })

@@ -32,10 +32,10 @@ export default function Comment(props) {
     }
 
     return(
-        <View>
-            <View>
+        <View style={styles.wrapper}>
+            <View style={styles.header}>
                 <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-                    <Image style={styles.icon} source={{ uri: `${serverUrl}/users/${comment.creator._id}/avatar/${comment.creator.avatar}` }} />
+                    <Image style={styles.avatar} source={{ uri: `${serverUrl}/users/${comment.user}/avatar/${comment.creator.avatar}` }} />
                     <Text style={{ color: 'white', fontSize: 18 }}>{comment.creator.username}</Text>
                 </View>
 
@@ -44,7 +44,7 @@ export default function Comment(props) {
 
             <View>
                 {files.length != 0 &&
-                <View>
+                <View style={styles.images}>
                     {files[select].mimetype == 'image' && <Image style={{ height: 200, resizeMode: 'contain' }} source={{ uri: files[select].src }} />}
                     {files[select].mimetype == 'video' && <VideoPlayer uri={files[select].src} />}
 
@@ -63,8 +63,8 @@ export default function Comment(props) {
                     data={apps}
                     keyExtractor={item => item.src}
                     renderItem={({ item }) => 
-                        <View>
-                            <Image source={require('../assets/file.png')} style={{ height: 35, width: 35, resizeMode: 'contain' }} />
+                        <View style={styles.file}>
+                            <Image source={require('../assets/file.png')} style={{ height: 25, width: 25, resizeMode: 'contain' }} />
                             <A href={item.src} style={{ color: '#949AAF', fontSize: 20, textOverflow: 'ellipsis' }}>{item.name}</A>
                         </View>
                     }
@@ -72,7 +72,7 @@ export default function Comment(props) {
             </View>
 
             {comment.text != '' &&
-            <View>
+            <View style={styles.text}>
                 <Text style={{ color: 'white', fontSize: 20 }}>{comment.text}</Text>
             </View>}
         </View>
@@ -80,5 +80,46 @@ export default function Comment(props) {
 }
 
 const styles = StyleSheet.create({
-    
+    wrapper: {
+        backgroundColor: '#26282E',
+        marginVertical: 5,
+        borderRadius: 20,
+        overflow: 'hidden',
+    },
+
+    header: {
+        width: '100%',
+        height: 25,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 10,
+        backgroundColor: '#353941',
+    },
+
+    avatar: {
+        width: 20,
+        height: 20,
+        resizeMode: 'cover',
+        borderRadius: 200,
+    },
+
+    text: {
+        margin: 10,
+    },
+
+    file: {
+        width: '80%',
+        marginHorizontal: '10%',
+        marginVertical: 5,
+        padding: 10,
+        flexDirection: 'row',
+        gap: 5,
+        backgroundColor: '#353941',
+        borderRadius: 20,
+    },
+
+    images: {
+        justifyContent: 'center',
+    }
 })

@@ -17,7 +17,12 @@ export default function Chats({ navigation }) {
     const [newChatName, setNewChatName] = useState('');
 
     useEffect(() => {
-        server('/chat/getChats', { id: userData._id }).then(result => setChats([...result.filter(chat => chat.notify != 0), ...result.filter(chat => chat.notify == 0)]));
+        socket.emit('getChats', { senderId: userData._id });
+        socket.on('getChats', chats => setChats(chats));
+
+        return () => {
+            socket.off('getChats');
+        }
     }, [])
 
     useEffect(() => {
@@ -80,12 +85,17 @@ export default function Chats({ navigation }) {
                 ListEmptyComponent={() => <Text style={{ color: '#949AAF', fontSize: 20, fontStyle: 'italic', textAlign: 'center', marginTop: 300 }}>Нет чатов</Text>}
                 renderItem={({ item }) =>
                     <Pressable style={styles.chat} onPress={() => navigation.navigate('Chat', { id: item._id })}>
-                        <View>
-                            <Image style={styles.avatar} source={{ uri: serverUrl + item.avatar }} />
-                            {item.online && <View style={styles.status}></View>}
-                        </View>
-                        <Text style={styles.name}>{item.name}</Text>
-                        {item.notify != undefined && item.notify != 0 && <Text style={styles.notify}>{item.notify}</Text>}
+                        {item.type == 'personal' &&
+                        <View style={styles.chat}>
+                            <Image style={styles.avatar} source={{ uri: `${serverUrl}/users/${item.user._id}/avatar/${item.user.avatar}` }} />
+                            <Text style={styles.name}>{item.user.username}</Text>
+                        </View>}
+
+                        {item.type == 'public' &&
+                        <View style={styles.chat}>
+                            <Image style={styles.avatar} source={{ uri: `${serverUrl}/chats/${item._id}/avatar/${item.avatar}` }} />
+                            <Text style={styles.name}>{item.name}</Text>
+                        </View>}
                     </Pressable>
                 }
             />
@@ -106,7 +116,7 @@ const styles = StyleSheet.create({
         width: '95%',
         height: 80,
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         backgroundColor: '#26282E',
         borderRadius: 20,
         alignSelf: 'center',

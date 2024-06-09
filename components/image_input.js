@@ -16,7 +16,6 @@ export default function ImageInput(props) {
       
         if(!result.canceled) {
             const images = result.assets;
-            console.log(images)
 
             setImages(images);
             setValue(images);

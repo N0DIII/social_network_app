@@ -7,10 +7,9 @@ import serverUrl from '../scripts/server_url';
 
 import { Context } from '../components/context';
 import VideoPlayer from '../components/videoplayer';
-import Comments from './comments';
 
 export default function Post(props) {
-    const { post, navigation } = props;
+    const { post, setShowComments, setPostId } = props;
     const { userData } = useContext(Context);
 
     const [files, setFiles] = useState([]);
@@ -21,11 +20,9 @@ export default function Post(props) {
     const [text, setText] = useState(post.text);
     const [newFiles, setNewFiles] = useState([]);
     const [deletedFiles, setDeletedFiles] = useState([]);
-    const [showComments, setShowComments] = useState(false);
     const [like, setLike] = useState(post.like);
     const [likeCount, setLikeCount] = useState(post.likeCount);
     const [commCount, setCommCount] = useState(post.commentCount);
-    const [comments, setComments] = useState([]);
 
     useEffect(() => {
         setFiles([]);
@@ -72,18 +69,8 @@ export default function Post(props) {
         })
     }
 
-    function openComments() {
-        server('/getComments', { postId: post._id })
-        .then(result => {
-            if(result.error) setError([true, result.message]);
-            else setComments(result.comments);
-        })
-
-        setShowComments(true);
-    }
-
     return(
-        <View style={[styles.post, showComments ? { height: 600 } : {}]}>
+        <View style={styles.post}>
             <View style={styles.post_header}>
                 {post.type == 'user' &&
                 <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
@@ -152,20 +139,12 @@ export default function Post(props) {
                         <Image style={styles.icon} source={!like ? require('../assets/whiteLike.png') : require('../assets/redLike.png')} />
                         <Text style={{ color: 'white', fontSize: 18 }}>{numberRound(likeCount)}</Text>
                     </Pressable>
-                    <Pressable style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }} onPress={openComments}>
+                    <Pressable style={{ flexDirection: 'row', gap: 5, alignItems: 'center' }} onPress={() => { setPostId(post._id), setShowComments(true); }}>
                         <Image style={styles.icon} source={require('../assets/comments.png')} />
                         <Text style={{ color: 'white', fontSize: 18 }}>{numberRound(commCount)}</Text>
                     </Pressable>
                 </View>
             </View>
-
-            {showComments &&
-            <Comments
-                close={() => setShowComments(false)}
-                comments={comments}
-                setComments={setComments}
-                openComments={openComments}
-            />}
         </View>
     )
 }

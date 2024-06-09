@@ -1,88 +1,42 @@
 import { useState, useEffect, useContext } from 'react';
-import { StyleSheet, View, Pressable, Image, FlatList, Text } from 'react-native';
+import { StyleSheet, View, Pressable, Image, FlatList, Text, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
+import { server, serverFile } from '../scripts/server';
+
 import { Context } from './context';
 import Comment from './comment';
+import ImageInput from './image_input';
 
 export default function Comments(props) {
     const { userData } = useContext(Context);
-    const { close, comments, setComments } = props;
+    const { close, postId } = props;
 
+    const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [commFiles, setCommFiles] = useState([]);
-    const [commNewFiles, setCommNewFiles] = useState([]);
-    const [commDeletedFiles, setCommDeletedFiles] = useState([]);
-    const [isEditComm, setIsEditComm] = useState([false]);
     const [showFiles, setShowFiles] = useState(false);
 
-    function changeFiles() {
-        setShowFiles(!showFiles);
-        setCommNewFiles([]);
-    }
-
-    function cancelChange() {
-        setNewComment('');
-        setShowFiles(false);
-        setCommDeletedFiles([]);
-        setIsEditComm([false]);
-    }
+    useEffect(() => {
+        server('/getComments', { postId })
+        .then(result => {
+            if(result.error) setError([true, result.message]);
+            else setComments(result.comments);
+        })
+    }, [postId])
 
     function sendComment() {
-        if(newComment.trim() == '' && commNewFiles.length == 0) return;
+        if(newComment.trim() == '' && commFiles.length == 0) return;
 
-        if(!isEditComm[0]) {
-            serverFile('/createComment', { senderId: userData._id, postId: post._id, text: newComment }, commNewFiles)
-            .then(result => {
-                if(result.error) setError([true, result.message]);
-                else {
-                    setComments(prevState => [...prevState, result.comment]);
-                    setNewComment('');
-                    setShowFiles(false);
-                    setCommNewFiles([]);
-                    setCommCount(prevState => prevState + 1);
-                }
-            })
-        }
-        else {
-            serverFile('/changeComment', { commentId: isEditComm[1], postId: post._id, text: newComment, deletedFiles: commDeletedFiles }, commNewFiles)
-            .then(result => {
-                if(result.error) setError([true, result.message]);
-                else {
-                    setComments(prevState => prevState.map(item => {
-                        if(item._id == result.comment._id) return result.comment;
-                        else return item;
-                    }))
-                    setCommNewFiles([]);
-                    cancelChange();
-                }
-            })
-        }
-    }
-
-    function closeComments() {
-        setComments([]);
-        setShowComments(false);
-    }
-
-    function changeComment(files, text, commentId) {
-        setIsEditComm([true, commentId]);
-        setNewComment(text);
-
-        if(files.length != 0) {
-            setCommFiles(files);
-            setShowFiles(true);
-        }
-    }
-
-    function deleteComment(commentId) {
-        server('/deleteComment', { postId: post._id, commentId })
+        serverFile('/createComment', { senderId: userData._id, postId, text: newComment }, commFiles)
         .then(result => {
             if(result.error) setError([true, result.message]);
             else {
-                setComments(prevState => prevState.filter(item => item._id != commentId));
-                setCommCount(prevState => prevState - 1);
+                setComments(prevState => [...prevState, result.comment]);
+                setNewComment('');
+                setShowFiles(false);
+                setCommFiles([]);
             }
         })
     }
@@ -95,11 +49,27 @@ export default function Comments(props) {
             </Pressable>
 
             <FlatList
+                contentContainerStyle={{ paddingVertical: '25%' }}
                 data={comments}
                 keyExtractor={item => item._id}
                 renderItem={({ item }) => <Comment comment={item} />}
+                ListEmptyComponent={() => <Text style={styles.noComments}>Нет комментариев</Text>}
             />
             
+            <View style={styles.newComment}>
+                <Pressable onPress={() => setShowFiles(!showFiles)}>
+                    <Image style={styles.icon} source={require('../assets/clip.png')} />
+                </Pressable>
+                <TextInput style={styles.input} value={newComment} onChangeText={setNewComment} placeholder='Новый комментарий' placeholderTextColor='#949AAF' />
+                <Pressable onPress={sendComment}>
+                    <Image style={styles.icon} source={require('../assets/send.png')} />
+                </Pressable>
+            </View>
+
+            {showFiles &&
+            <BlurView style={styles.files} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+                <ImageInput setValue={setCommFiles} />
+            </BlurView>}
         </BlurView>
         </SafeAreaView>
     )
@@ -113,6 +83,7 @@ const styles = StyleSheet.create({
     },
     
     wrapper: {
+        position: 'relative',
         height: '106%',
         width: '100%',
     },
@@ -126,4 +97,41 @@ const styles = StyleSheet.create({
         height: 35,
         width: 35,
     },
+
+    newComment: {
+        position: 'absolute',
+        bottom: 40,
+        width: '100%',
+        height: 45,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 5,
+        backgroundColor: '#26282E',
+    },
+
+    input: {
+        width: '80%',
+        height: 45,
+        fontSize: 16,
+        color: 'white',
+    },
+
+    icon: {
+        width: 25,
+        height: 25,
+    },
+
+    files: {
+        position: 'absolute',
+        bottom: 85,
+        width: '100%',
+    },
+
+    noComments: {
+        width: '100%',
+        textAlign: 'center',
+        fontSize: 20,
+        color: '#949AAF',
+    }
 })
