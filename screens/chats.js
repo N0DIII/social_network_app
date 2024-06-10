@@ -73,6 +73,7 @@ export default function Chats({ navigation }) {
                         {item.type == 'personal' &&
                         <View style={styles.chat}>
                             <Image style={styles.avatar} source={{ uri: `${serverUrl}/users/${item.user._id}/avatar/${item.user.avatar}` }} />
+                            {item.user.online && <View style={styles.online}></View>}
                             <Text style={styles.name}>{item.user.username}</Text>
                         </View>}
 
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
     },
 
     chat: {
+        position: 'relative',
         flexDirection: 'row',
         gap: 10,
         width: '95%',
@@ -129,7 +131,13 @@ const styles = StyleSheet.create({
         backgroundColor: 'green',
     },
 
-    notify: {
-
+    online: {
+        position: 'absolute',
+        left: 58,
+        bottom: 16,
+        width: 6,
+        height: 6,
+        backgroundColor: 'green',
+        borderRadius: 200,
     }
 })

@@ -141,7 +141,8 @@ export default function Chat({ route }) {
                 <View style={styles.info}>
                     <Image style={styles.avatar} source={{ uri: `${serverUrl}/users/${chat.user._id}/avatar/${chat.user.avatar}` }} />
                     <Text style={[styles.name, { position: 'absolute', left: 45, top: 5 }]}>{chat.user.username}</Text>
-                    <TimeAgo style={styles.time} date={chat.user.last_online} />
+                    {chat.user.online && <Text style={styles.time}>В сети</Text>}
+                    {!chat.user.online && <TimeAgo style={styles.time} date={chat.user.last_online} />}
                 </View>}
 
                 {chat.type == 'public' &&
