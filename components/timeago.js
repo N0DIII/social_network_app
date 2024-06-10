@@ -1,8 +1,8 @@
 import { Text } from 'react-native';
 import React from 'react';
-import ReactTimeAgo from '../node_modules/react-timeago';
-import ruStrings from '../node_modules/react-timeago/lib/language-strings/ru';
-import buildFormatter from '../node_modules/react-timeago/lib/formatters/buildFormatter';
+import ReactTimeAgo from 'react-timeago';
+import ruStrings from 'react-timeago/lib/language-strings/ru';
+import buildFormatter from 'react-timeago/lib/formatters/buildFormatter';
 
 const formatter = buildFormatter(ruStrings);
 
