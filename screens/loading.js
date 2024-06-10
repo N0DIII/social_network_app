@@ -9,7 +9,7 @@ import { Context } from '../components/context';
 import Button from '../components/button';
 
 export default function Loading({ navigation }) {
-    const { setUserData, socket } = useContext(Context);
+    const { setUserData } = useContext(Context);
 
     const timer = useRef(null);
     const [load, setLoad] = useState({ left: '-20%' });
@@ -23,7 +23,6 @@ export default function Loading({ navigation }) {
                     if(result._id == undefined) navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
                     else {
                         setUserData(result);
-                        socket.emit('online', { id: result._id });
                         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
                     }
                 })

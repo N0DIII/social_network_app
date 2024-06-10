@@ -12,9 +12,6 @@ export default function Chats({ navigation }) {
     const { userData, setError, socket } = useContext(Context);
 
     const [chats, setChats] = useState([]);
-    const [showButton, setShowButton] = useState(false);
-    const [startCreate, setStartCreate] = useState(false);
-    const [newChatName, setNewChatName] = useState('');
 
     useEffect(() => {
         socket.emit('getChats', { senderId: userData._id });
@@ -61,18 +58,6 @@ export default function Chats({ navigation }) {
             socket.off('createdChat');
         }
     }, [chats])
-
-    function createPublicChat() {
-        socket.emit('createPublicChat', { user: id, name: newChatName.value });
-        socket.on('createPublicChat', result => {
-            if(result.error) setError([true, result.message]);
-            else {
-                setShowButton(false);
-                setStartCreate(false);
-                navigate(`/chat/${result.id}`);
-            }
-        })
-    }
 
     return(
         <SafeAreaView style={styles.screen}>

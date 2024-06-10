@@ -23,6 +23,7 @@ export default function Chat({ route }) {
     const [newFiles, setNewFiles] = useState([]);
     const [showFiles, setShowFiles] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
+    const [blockSend, setBlockSend] = useState(false);
 
     const [count, setCount] = useState(0);
     const [maxCount, setMaxCount] = useState(1);
@@ -44,7 +45,6 @@ export default function Chat({ route }) {
 
         socket.on('getMessage', message => {
             setMessages(prevState => [message, ...prevState]);
-            getChatFiles();
         })
 
         socket.on('changeMessage', message => {
@@ -105,7 +105,8 @@ export default function Chat({ route }) {
     }, [maxCount, messages])
 
     function sendMessage() {
-        if(newMessage.trim() == '' && newFiles.length == 0) return;
+        if((newMessage.trim() == '' && newFiles.length == 0) || blockSend) return;
+        setBlockSend(true);
 
         serverFile('/createMessage', { senderId: userData._id, chatId: id, text: newMessage }, newFiles)
         .then(result => {
@@ -115,6 +116,7 @@ export default function Chat({ route }) {
                 setNewMessage('');
                 setShowFiles(false);
                 setNewFiles([]);
+                setBlockSend(false);
             }
         })
     }
@@ -129,7 +131,6 @@ export default function Chat({ route }) {
                 data={messages}
                 keyExtractor={item => item._id}
                 renderItem={({ item }) => <Message message={item} chatId={id} />}
-                ListEmptyComponent={() => <View style={{ alignItems: 'center', marginVertical: 50 }}><Text style={{ color: '#949AAF', fontStyle: 'italic', fontSize: 18 }}>Нет сообщений</Text></View>}
                 onStartReachedThreshold={0.25}
                 onStartReached={scroll}
             />

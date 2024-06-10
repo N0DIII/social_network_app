@@ -98,7 +98,7 @@ export default function UserProfile({ route, navigation }) {
     function createChat() {
         socket.emit('createChat', { type: 'personal', senderId: userData._id, userId: id });
         socket.on('createChat', result => {
-            //navigate(`/chat/${result.id}`);
+            navigation.navigate('Chat', { id: result.id });
             socket.off('createChat');
         })
     }
@@ -136,10 +136,10 @@ export default function UserProfile({ route, navigation }) {
                         {user?.birthday != undefined && <Text style={styles.text}>{getAge(user.birthday)}</Text>}
 
                         <View style={styles.buttons}>
-                            {friendStatus == 0 && <Button title='Добавить в друзья' onClick={() => reqFriend('/user/addFriend')} />}
+                            {friendStatus == 0 && <Button title='Добавить в друзья' onClick={() => reqFriend('/friendRequest')} />}
                             {friendStatus == 1 && <Button title='Приглашение отправлено' />}
-                            {friendStatus == 2 && <Button title='Принять приглашение' onClick={() => reqFriend('/user/acceptFriend')} />}
-                            {friendStatus == 3 && <Button title='Удалить из друзей' onClick={() => setConfirm([true, reqFriend, ['/user/deleteFriend']])} />}
+                            {friendStatus == 2 && <Button title='Принять приглашение' onClick={() => reqFriend('/friendAccept')} />}
+                            {friendStatus == 3 && <Button title='Удалить из друзей' onClick={() => setConfirm([true, reqFriend, ['/friendDelete']])} />}
                             <Button title='Написать' onClick={createChat} />
                         </View>
 

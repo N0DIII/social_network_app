@@ -1,6 +1,8 @@
+import { useEffect, useContext } from 'react';
 import { StyleSheet, Image } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { Context } from '../components/context';
 import MyProfile from './my_profile';
 import Chats from './chats';
 import Friends from './friends';
@@ -10,6 +12,12 @@ import Posts from './posts';
 const Tab = createBottomTabNavigator();
 
 export default function Main() {
+    const { userData, socket } = useContext(Context);
+
+    useEffect(() => {
+        socket.emit('online', { id: userData._id });
+    }, [])
+
     function tabIcon(name) {
         if(name == 'Posts') return <Image style={styles.icon} source={require('../assets/home.png')} />
         if(name == 'Groups') return <Image style={styles.icon} source={require('../assets/groups.png')} />
