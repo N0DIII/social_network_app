@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { StyleSheet, View, Text, Pressable, FlatList, Image } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 import { server } from '../scripts/server';
 import serverUrl from '../scripts/server_url';
@@ -56,19 +57,8 @@ export default function GroupList({ navigation }) {
         <View style={styles.screen}>
             <Background />
 
-            <View style={styles.navigation}>
-                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('subscribe')}>
-                    <Text style={[styles.nav_text, selectNav == 'subscribe' ? { borderBottomWidth: 2 } : {}]}>Подписки</Text>
-                </Pressable>
-                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('own')}>
-                    <Text style={[styles.nav_text, selectNav == 'own' ? { borderBottomWidth: 2 } : {}]}>Мои группы</Text>
-                </Pressable>
-                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('all')}>
-                    <Text style={[styles.nav_text, selectNav == 'all' ? { borderBottomWidth: 2 } : {}]}>Все группы</Text>
-                </Pressable>
-            </View>
-
             <FlatList
+                contentContainerStyle={{ paddingVertical: 140 }}
                 style={styles.groups}
                 data={groups}
                 keyExtractor={item => item._id}
@@ -89,6 +79,18 @@ export default function GroupList({ navigation }) {
                 }
             />
 
+            <BlurView style={styles.navigation} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('subscribe')}>
+                    <Text style={[styles.nav_text, selectNav == 'subscribe' ? { borderBottomWidth: 2 } : {}]}>Подписки</Text>
+                </Pressable>
+                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('own')}>
+                    <Text style={[styles.nav_text, selectNav == 'own' ? { borderBottomWidth: 2 } : {}]}>Мои группы</Text>
+                </Pressable>
+                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('all')}>
+                    <Text style={[styles.nav_text, selectNav == 'all' ? { borderBottomWidth: 2 } : {}]}>Все группы</Text>
+                </Pressable>
+            </BlurView>
+
             <Search setValue={setSearch} icon={true} onClick={() => setShowCreate(true)} />
 
             {showCreate && <CreateGroup close={() => setShowCreate(false)} navigation={navigation} />}
@@ -104,12 +106,13 @@ const styles = StyleSheet.create({
     },
 
     navigation: {
+        position: 'absolute',
+        top: 80,
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 90,
         width: '100%',
-        height: 35,
+        height: 45,
         overflow: 'hidden',
     },
 
@@ -121,9 +124,6 @@ const styles = StyleSheet.create({
     },
 
     groups: {
-        position: 'absolute',
-        left: 0,
-        top: 160,
         width: '100%',
     },
 
@@ -137,11 +137,11 @@ const styles = StyleSheet.create({
     group: {
         flexDirection: 'row',
         width: '90%',
-        height: 80,
+        height: 60,
         backgroundColor: '#26282E',
         alignItems: 'center',
         borderRadius: 20,
-        marginVertical: 10,
+        marginVertical: 5,
         alignSelf: 'center',
     },
 

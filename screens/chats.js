@@ -2,14 +2,13 @@ import { useState, useEffect, useContext } from 'react';
 import { StyleSheet, View, Text, FlatList, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { server } from '../scripts/server';
 import serverUrl from '../scripts/server_url';
 
 import { Context } from '../components/context';
 import Background from '../components/background';
 
 export default function Chats({ navigation }) {
-    const { userData, setError, socket } = useContext(Context);
+    const { userData, socket } = useContext(Context);
 
     const [chats, setChats] = useState([]);
 
@@ -23,39 +22,25 @@ export default function Chats({ navigation }) {
     }, [])
 
     useEffect(() => {
-        function chatOnline(id, bool) {
-            let chat = chats.find(item => item._id == id && item.type == 'personal');
-            if(chat == undefined) return;
-            let index = chats.indexOf(chat);
-            chat.online = bool;
-            setChats([...chats.slice(0, index), chat, ...chats.slice(index + 1, chats.length)]);
-        }
+        if(chats == null || chats.length == 0) return;
 
-        socket.on('userOnline', id => chatOnline(id, true));
-        socket.on('userOffline', id => chatOnline(id, false));
-
-        socket.on('newMessage', notify => {
-            const updChats = chats.map(chat => {
-                if(chat._id == notify.chat) {
-                    let updChat = chat;
-                    updChat.notify = notify.count;
-                    return updChat;
-                }
+        socket.on('userOnline', id => {
+            setChats(prevState => prevState.map(chat => { 
+                if(chat.type == 'personal' && chat.user._id == id) return { ...chat, user: { ...chat.user, online: true } };
                 else return chat;
-            })
-            setChats([...updChats.filter(chat => chat.notify != 0), ...updChats.filter(chat => chat.notify == 0)]);
+            }))
         })
 
-        socket.on('createdChat', chat => {
-            server('/chat/getChat', { chatID: chat, userID: id }).then(result => setChats([...chats, result]));
-            socket.emit('joinChat', chat);
+        socket.on('userOffline', id => {
+            setChats(prevState => prevState.map(chat => { 
+                if(chat.type == 'personal' && chat.user._id == id) return { ...chat, user: { ...chat.user, online: false } };
+                else return chat;
+            }))
         })
 
         return () => {
             socket.off('userOnline');
             socket.off('userOffline');
-            socket.off('newMessage');
-            socket.off('createdChat');
         }
     }, [chats])
 
@@ -101,13 +86,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         gap: 10,
         width: '95%',
-        height: 80,
+        height: 60,
         alignItems: 'center',
-        paddingHorizontal: 10,
+        paddingHorizontal: 5,
         backgroundColor: '#26282E',
         borderRadius: 20,
         alignSelf: 'center',
-        marginVertical: 10,
+        marginVertical: 5,
     },
 
     avatar: {
@@ -121,20 +106,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
     },
 
-    status: {
-        position: 'absolute',
-        right: 0,
-        bottom: 0,
-        borderRadius: 200,
-        width: 6,
-        height: 6,
-        backgroundColor: 'green',
-    },
-
     online: {
         position: 'absolute',
-        left: 58,
-        bottom: 16,
+        left: 50,
+        bottom: 10,
         width: 6,
         height: 6,
         backgroundColor: 'green',

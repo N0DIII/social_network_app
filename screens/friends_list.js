@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { StyleSheet, View, Text, Pressable, FlatList, Image } from 'react-native';
+import { BlurView } from 'expo-blur';
 
 import { server } from '../scripts/server';
 import serverUrl from '../scripts/server_url';
@@ -65,19 +66,8 @@ export default function FriendsList({ navigation }) {
         <View style={styles.screen}>
             <Background />
 
-            <View style={styles.navigation}>
-                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('friends')}>
-                    <Text style={[styles.nav_text, selectNav == 'friends' ? { borderBottomWidth: 2 } : {}]}>Друзья</Text>
-                </Pressable>
-                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('requests')}>
-                    <Text style={[styles.nav_text, selectNav == 'requests' ? { borderBottomWidth: 2 } : {}]}>Приглашения</Text>
-                </Pressable>
-                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('users')}>
-                    <Text style={[styles.nav_text, selectNav == 'users' ? { borderBottomWidth: 2 } : {}]}>Все пользователи</Text>
-                </Pressable>
-            </View>
-
             <FlatList
+                contentContainerStyle={{ paddingVertical: 140 }}
                 style={styles.users}
                 data={items}
                 keyExtractor={item => item._id}
@@ -100,6 +90,18 @@ export default function FriendsList({ navigation }) {
                 }
             />
 
+            <BlurView style={styles.navigation} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('friends')}>
+                    <Text style={[styles.nav_text, selectNav == 'friends' ? { borderBottomWidth: 2 } : {}]}>Друзья</Text>
+                </Pressable>
+                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('requests')}>
+                    <Text style={[styles.nav_text, selectNav == 'requests' ? { borderBottomWidth: 2 } : {}]}>Приглашения</Text>
+                </Pressable>
+                <Pressable style={{ height: 45 }} onPress={() => setSelectNav('users')}>
+                    <Text style={[styles.nav_text, selectNav == 'users' ? { borderBottomWidth: 2 } : {}]}>Все пользователи</Text>
+                </Pressable>
+            </BlurView>
+
             <Search setValue={setSearch} />
         </View>
     )
@@ -113,12 +115,13 @@ const styles = StyleSheet.create({
     },
 
     navigation: {
+        position: 'absolute',
+        top: 80,
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 90,
         width: '100%',
-        height: 35,
+        height: 45,
         overflow: 'hidden',
     },
 
@@ -130,9 +133,6 @@ const styles = StyleSheet.create({
     },
 
     users: {
-        position: 'absolute',
-        left: 0,
-        top: 160,
         width: '100%',
     },
 
@@ -146,11 +146,11 @@ const styles = StyleSheet.create({
     user: {
         flexDirection: 'row',
         width: '90%',
-        height: 80,
+        height: 60,
         backgroundColor: '#26282E',
         alignItems: 'center',
         borderRadius: 20,
-        marginVertical: 10,
+        marginVertical: 5,
         alignSelf: 'center',
     },
 

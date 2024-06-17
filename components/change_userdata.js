@@ -19,7 +19,7 @@ export default function ChangeUserData(props) {
 
     const [avatar, setAvatar] = useState('');
     const [username, setUsername] = useState(userData.username);
-    const [birthday, setBirthday] = useState(userData?.birthday != undefined ? new Date(userData.birthday) : new Date('3000-01-01'));
+    const [birthday, setBirthday] = useState(userData?.birthday != undefined ? userData.birthday : '3000-01-01');
     const [sex, setSex] = useState(userData?.sex != undefined ? userData.sex : '');
 
     function save() {
@@ -51,11 +51,11 @@ export default function ChangeUserData(props) {
                 </View>
 
                 <View style={styles.block}>
-                    <Select data={[{ value: 'м', text: 'Мужской' }, { value: 'ж', text: 'Женский' }]} defaulValue={sex} setValue={setSex} title='Пол' />
+                    <Select data={[{ value: 'м', text: 'Мужской' }, { value: 'ж', text: 'Женский' }]} defaultValue={{ value: sex, text: sex == 'м' ? 'Мужской' : 'Женский' }} setValue={setSex} title='Пол' />
                 </View>
 
                 <View style={styles.block}>
-                    <DatePicker title='Дата рождения' value={birthday} setValue={setBirthday} />
+                    <DatePicker title='Дата рождения' value={new Date(birthday)} setValue={setBirthday} />
                 </View>
 
                 <View style={styles.block}>

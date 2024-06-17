@@ -16,7 +16,7 @@ export default function Album({ route, navigation }) {
     const { setError, userData, setConfirm, setSuccess } = useContext(Context);
 
     const [album, setAlbum] = useState(null);
-    const [photos, setPhotos] = useState(null);
+    const [photos, setPhotos] = useState([]);
     const [changeName, setChangeName] = useState(false);
     const [name, setName] = useState();
 
@@ -79,12 +79,16 @@ export default function Album({ route, navigation }) {
 
             <FlatList
                 style={styles.photo_wrapper}
-                contentContainerStyle={{ paddingVertical: 50 }}
+                contentContainerStyle={{ paddingVertical: 50, alignItems: 'center', gap: 10 }}
                 data={photos}
-                keyExtractor={item => item.src}
+                keyExtractor={item => item}
+                numColumns={2}
                 renderItem={({ item }) => 
                     <View>
-                        {item.mimetype == 'image' && <Image style={styles.photo} source={{ uri: `${serverUrl}/users/${album.user}/albums/${id}/${item.src}` }} />}
+                        {item.mimetype == 'image' &&
+                        <Pressable style={styles.photo} onPress={() => selectImage(item.src)}>
+                            <Image style={styles.photo} source={{ uri: `${serverUrl}/users/${album.user}/albums/${id}/${item.src}` }} />
+                        </Pressable>}
                         {item.mimetype == 'video' && 
                         <View style={styles.photo}>
                             <VideoPlayer uri={`${serverUrl}/users/${album.user}/albums/${id}/${item.src}`} />
@@ -170,11 +174,11 @@ const styles = StyleSheet.create({
     },
 
     photo: {
-        width: 300,
-        height: 300,
+        width: 150,
+        height: 200,
         resizeMode: 'contain',
         alignSelf: 'center',
-        marginVertical: 10,
+        marginHorizontal: 10,
         backgroundColor: 'rgba(53, 57, 65, 0.5)',
         borderRadius: 20,
         overflow: 'hidden',

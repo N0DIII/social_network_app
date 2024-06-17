@@ -123,7 +123,7 @@ export default function GroupProfile({ route, navigation }) {
 
                         {group.category != '' &&
                         <View>
-                            <Text style={styles.title}>Категория: {group.category}</Text>
+                            <Text style={styles.title}>Категория: <Text style={styles.text}>{group.category}</Text></Text>
                         </View>}
 
                         {group.description != '' && <Text style={styles.title}>Описание: </Text>}
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
 
     text: {
         color: 'white',
-        fontSize: 30,
+        fontSize: 28,
         marginBottom: 5,
     },
 
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     title: {
         color: '#949AAF',
         fontSize: 26,
-        marginVertical: 20,
+        marginVertical: 10,
     },
 
     text_list: {

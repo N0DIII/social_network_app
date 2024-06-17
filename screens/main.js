@@ -15,7 +15,7 @@ export default function Main() {
     const { userData, socket } = useContext(Context);
 
     useEffect(() => {
-        socket.emit('online', { id: userData._id });
+        setTimeout(() => socket.emit('online', { id: userData._id }), 5000)
     }, [])
 
     function tabIcon(name) {

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 
 import { server } from '../scripts/server';
+import str_rand from '../scripts/str_rand';
 
 import { Context } from '../components/context';
 import Background from '../components/background';
@@ -9,8 +10,8 @@ import Search from '../components/search';
 import Post from '../components/post';
 import Comments from '../components/comments';
 
-export default function Posts({ navigation }) {
-    const { userData, setError } = useContext(Context);
+export default function Posts() {
+    const { userData } = useContext(Context);
 
     const [search, setSearch] = useState('');
     const [posts, setPosts] = useState(null);
@@ -69,7 +70,7 @@ export default function Posts({ navigation }) {
             <FlatList
                 contentContainerStyle={{ paddingVertical: 100 }}
                 data={posts}
-                keyExtractor={item => item._id}
+                keyExtractor={item => item.key}
                 refreshing={refresh}
                 onRefresh={refreshing}
                 renderItem={({ item }) => <Post post={item} setShowComments={setShowComments} setPostId={setPostId} />}

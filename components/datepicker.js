@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet, View, Pressable, Text, Image } from 'react-native';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 export default function DatePicker(props) {
     const { title, value, setValue } = props;
 
-    const [text, setText] = useState(title);
+    const [text, setText] = useState();
+
+    useEffect(() => {
+        setText(value == '3000-01-01' ? title : formatDate(value));
+    }, [value])
 
     const formatDate = (rawDate) => {
         let date = new Date(rawDate);
@@ -24,7 +28,7 @@ export default function DatePicker(props) {
             value,
             onChange,
             mode: 'date',
-            maximumDate: new Date(new Date().getFullYear() - 15, 0, 1),
+            maximumDate: new Date(new Date().getFullYear() - 5, 0, 1),
             minimumDate: new Date(1900, 0, 1)
         })
     }

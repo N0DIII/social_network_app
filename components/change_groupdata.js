@@ -20,10 +20,10 @@ export default function ChangeGroupData(props) {
     const [name, setName] = useState(group.name);
     const [description, setDescription] = useState(group.description);
     const [categories, setCategories] = useState([]);
-    const [selectCategory, setSelectCategory] = useState(group.categories);
+    const [selectCategory, setSelectCategory] = useState(group.category);
 
     useEffect(() => {
-        server('/getGroupCategories').then(result => setCategories(result.categories));
+        server('/getGroupCategories').then(result => setCategories(result.categories.map(item => { return { value: item.name, text: item.name } })));
     }, [])
 
     function save() {
@@ -55,11 +55,13 @@ export default function ChangeGroupData(props) {
                 </View>
 
                 <View style={styles.block}>
+                    {categories.length != 0 &&
                     <Select
-                        data={categories.map(item => { return { value: item.name, text: item.name } })}
+                        data={categories}
                         setValue={setSelectCategory}
+                        defaultValue={{ value: selectCategory, text: selectCategory }}
                         title='Категория'
-                    />
+                    />}
                 </View>
 
                 <View style={styles.block}>

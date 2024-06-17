@@ -16,7 +16,7 @@ export default function AlbumList(props) {
             renderItem={({ item }) => 
                 <Pressable onPress={() => navigation.navigate('Album', { id: item._id })}>
                     <View style={styles.album}>
-                        {item.cover != null && <Image style={styles.cover} source={{ uri: serverUrl + item.cover }} />}
+                        {item.files.length != 0 && item.files[0].mimetype == 'image' && <Image style={styles.cover} source={{ uri: `${serverUrl}/users/${item.user}/albums/${item._id}/${item.files[0].src}` }} />}
                         <Text style={styles.name}>{item.name}</Text>
                     </View>
                 </Pressable>
