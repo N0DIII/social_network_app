@@ -14,11 +14,11 @@ import Button from '../components/button';
 export default function Login({ navigation }) {
     const { setUserData, setError } = useContext(Context);
 
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     function sign() {
-        server('/login', { username, password })
+        server('/login', { email, password })
         .then(result => {
             if(result.error || result?.field != undefined) setError([true, result.message]);
             else {
@@ -37,7 +37,7 @@ export default function Login({ navigation }) {
 
             <View style={styles.form_wrapper}>
                 <Text style={styles.title}>Вход</Text>
-                <Input value={username} setValue={setUsername} placeholder='Имя пользователя' />
+                <Input value={email} setValue={setEmail} placeholder='Электронная почта' />
                 <InputPassword value={password} setValue={setPassword} placeholder='Пароль' />
                 <Button title='Войти' onClick={sign} />
                 <Text style={styles.text}>Еще нет аккаунта? <Text style={styles.text} onPress={() => navigation.navigate('Registration')}>Создать</Text></Text>

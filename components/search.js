@@ -6,7 +6,7 @@ export default function Search(props) {
     const { setValue, icon = false, onClick = () => {}, asset = 'plus' } = props;
 
     return(
-        <BlurView style={styles.blurView} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+        <BlurView style={styles.blurView} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
             <SafeAreaView style={styles.wrapper}>
                 <Image style={styles.icon} source={require('../assets/search.png')} />
                 <TextInput style={styles.input} placeholder='Введите запрос' onChangeText={setValue} placeholderTextColor='#949AAF' />

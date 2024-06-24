@@ -136,7 +136,7 @@ export default function Chat({ route }) {
             />
 
             {chat != null &&
-            <BlurView style={styles.header} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.header} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 {chat.type == 'personal' &&
                 <View style={styles.info}>
                     <Image style={styles.avatar} source={{ uri: `${serverUrl}/users/${chat.user._id}/avatar/${chat.user.avatar}` }} />
@@ -156,7 +156,7 @@ export default function Chat({ route }) {
                 </Pressable>
             </BlurView>}
 
-            <BlurView style={styles.newMessage} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.newMessage} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 <Pressable onPress={() => setShowFiles(!showFiles)}>
                     <Image style={styles.icon} source={require('../assets/clip.png')} />
                 </Pressable>
@@ -167,7 +167,7 @@ export default function Chat({ route }) {
             </BlurView>
 
             {showFiles &&
-            <BlurView style={styles.files} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.files} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 <ImageInput setValue={setNewFiles} />
             </BlurView>}
 

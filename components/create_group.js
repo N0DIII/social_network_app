@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { StyleSheet, View, Image, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Pressable, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
@@ -36,11 +36,12 @@ export default function CreateGroup(props) {
 
     return(
         <SafeAreaView style={styles.safe}>
-        <BlurView style={styles.wrapper} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+        <BlurView style={styles.wrapper} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
             <Pressable style={styles.close_wrapper} onPress={close}>
                 <Image style={styles.close} source={require('../assets/cross.png')} />
             </Pressable>
 
+            {userData.confirm &&
             <ScrollView style={styles.scroll} contentContainerStyle={{ paddingVertical: '50%' }}>
                 <View style={styles.block}>
                 <LoadAvatar value={require('../assets/defaultGroup.png')} setValue={setAvatar} />
@@ -65,7 +66,13 @@ export default function CreateGroup(props) {
                 <View style={styles.block}>
                     <Button title='Сохранить' onClick={create} />
                 </View>
-            </ScrollView>
+            </ScrollView>}
+
+            {!userData.confirm &&
+            <View style={{ flex: 1, justifyContent: 'center' }}>
+                <Text style={{ color: 'white', textAlign: 'center', fontSize: 28 }}>Подтвердите адрес электронной почты</Text>
+                <Text style={{ color: 'white', textAlign: 'center', fontSize: 28, marginVertical: 20 }}>Профиль → Изменить</Text>
+            </View>}
             
         </BlurView>
         </SafeAreaView>

@@ -1,9 +1,9 @@
 import { useState, useContext } from 'react';
-import { StyleSheet, View, Image, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Image, Pressable, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 
-import { serverFile } from '../scripts/server';
+import { server, serverFile } from '../scripts/server';
 import serverUrl from '../scripts/server_url';
 
 import { Context } from '../components/context';
@@ -19,24 +19,44 @@ export default function ChangeUserData(props) {
 
     const [avatar, setAvatar] = useState('');
     const [username, setUsername] = useState(userData.username);
+    const [email, setEmail] = useState(userData.email);
     const [birthday, setBirthday] = useState(userData?.birthday != undefined ? userData.birthday : '3000-01-01');
     const [sex, setSex] = useState(userData?.sex != undefined ? userData.sex : '');
+    const [stage, setStage] = useState(0);
+    const [code, setCode] = useState('');
 
     function save() {
-        serverFile('/changeUser', { userId: userData._id, username, sex, birthday, oldAvatar: userData.avatar }, [avatar])
+        serverFile('/changeUser', { userId: userData._id, username, email, sex, birthday, oldAvatar: userData.avatar }, [avatar])
         .then(result => {
             if(result.error) setError([true, result.message]);
             else {
-                setUserData(prevState => { return { ...prevState, username, sex, birthday, avatar: result.avatar != undefined ? result.avatar : prevState.avatar } });
+                setUserData(prevState => { return { ...prevState, username, sex, birthday, avatar: result.avatar != undefined ? result.avatar : prevState.avatar, email, confirm: email == userData.email ? userData.confirm : false } });
                 close();
             }
         })
         .catch(e => setError([true, 'Произошла ошибка']))
     }
 
+    function confirmEmail() {
+        if(stage == 0) {
+            server('/getConfirmCode', { email: userData.email })
+            .then(result => {
+                if(result.error) setError([true, result.message]);
+                else setStage(1);
+            })
+        }
+        else {
+            server('/checkConfirmCode', { email: userData.email, code, userId: userData._id })
+            .then(result => {
+                if(result.error) setError([true, result.message]);
+                else setUserData(prevState => { return { ...prevState, confirm: true } });
+            })
+        }
+    }
+
     return(
         <SafeAreaView style={styles.safe}>
-        <BlurView style={styles.wrapper} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+        <BlurView style={styles.wrapper} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
             <Pressable style={styles.close_wrapper} onPress={close}>
                 <Image style={styles.close} source={require('../assets/cross.png')} />
             </Pressable>
@@ -49,6 +69,22 @@ export default function ChangeUserData(props) {
                 <View style={styles.block}>
                     <Input value={username} setValue={setUsername} placeholder='Имя пользователя' />
                 </View>
+
+                <View style={styles.block}>
+                    <Input value={email} setValue={setEmail} placeholder='Электронная почта' />
+                    {!userData.confirm && <Text style={{ color: 'red', textAlign: 'center' }}>Электронная почта не подтверждена</Text>}
+                    {userData.confirm && <Text style={{ color: 'green', textAlign: 'center' }}>Электронная почта подтверждена</Text>}
+                </View>
+
+                {!userData.confirm && stage == 1 &&
+                <View style={styles.block}>
+                    <Input value={code} setValue={setCode} placeholder='Введите код' />
+                </View>}
+
+                {!userData.confirm &&
+                <View style={styles.block}>
+                    <Button title={stage == 0 ? 'Получить код подтверждения' : 'Подтвердить'} onClick={confirmEmail} />
+                </View>}
 
                 <View style={styles.block}>
                     <Select data={[{ value: 'м', text: 'Мужской' }, { value: 'ж', text: 'Женский' }]} defaultValue={{ value: sex, text: sex == 'м' ? 'Мужской' : 'Женский' }} setValue={setSex} title='Пол' />

@@ -79,7 +79,7 @@ export default function GroupList({ navigation }) {
                 }
             />
 
-            <BlurView style={styles.navigation} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.navigation} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 <Pressable style={{ height: 45 }} onPress={() => setSelectNav('subscribe')}>
                     <Text style={[styles.nav_text, selectNav == 'subscribe' ? { borderBottomWidth: 2 } : {}]}>Подписки</Text>
                 </Pressable>

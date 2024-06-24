@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 
 import { server } from '../scripts/server';
-import str_rand from '../scripts/str_rand';
 
 import { Context } from '../components/context';
 import Background from '../components/background';

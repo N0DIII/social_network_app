@@ -85,10 +85,7 @@ export default function Album({ route, navigation }) {
                 numColumns={2}
                 renderItem={({ item }) => 
                     <View>
-                        {item.mimetype == 'image' &&
-                        <Pressable style={styles.photo} onPress={() => selectImage(item.src)}>
-                            <Image style={styles.photo} source={{ uri: `${serverUrl}/users/${album.user}/albums/${id}/${item.src}` }} />
-                        </Pressable>}
+                        {item.mimetype == 'image' && <Image style={styles.photo} source={{ uri: `${serverUrl}/users/${album.user}/albums/${id}/${item.src}` }} />}
                         {item.mimetype == 'video' && 
                         <View style={styles.photo}>
                             <VideoPlayer uri={`${serverUrl}/users/${album.user}/albums/${id}/${item.src}`} />
@@ -97,7 +94,7 @@ export default function Album({ route, navigation }) {
                 }
             />
 
-            <BlurView style={styles.blurView} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.blurView} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 <SafeAreaView style={styles.header}>
                     {!changeName && <Text style={styles.title}>{name}</Text>}
                     {changeName && <TextInput style={styles.input} value={name} onChangeText={setName} placeholder='Без названия' placeholderTextColor='#949AAF' />}

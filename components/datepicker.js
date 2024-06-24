@@ -8,7 +8,7 @@ export default function DatePicker(props) {
     const [text, setText] = useState();
 
     useEffect(() => {
-        setText(value == '3000-01-01' ? title : formatDate(value));
+        setText(value.getTime() == new Date('3000-01-01').getTime() ? title : formatDate(value));
     }, [value])
 
     const formatDate = (rawDate) => {

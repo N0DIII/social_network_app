@@ -16,10 +16,6 @@ export default function Post(props) {
     const [apps, setApps] = useState([]);
     const [select, setSelect] = useState(0);
     const [textShow, setTextShow] = useState(false);
-    const [showChange, setShowChange] = useState(false);
-    const [text, setText] = useState(post.text);
-    const [newFiles, setNewFiles] = useState([]);
-    const [deletedFiles, setDeletedFiles] = useState([]);
     const [like, setLike] = useState(post.like);
     const [likeCount, setLikeCount] = useState(post.likeCount);
     const [commCount, setCommCount] = useState(post.commentCount);

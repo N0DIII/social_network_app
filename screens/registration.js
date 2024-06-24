@@ -17,11 +17,12 @@ export default function Registration({ navigation }) {
 
     const [avatar, setAvatar] = useState('');
     const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [repeatPassword, setRepeatPassword] = useState('');
 
     function reg() {
-        serverFile('/registration', { username, password, repeatPassword }, [avatar])
+        serverFile('/registration', { username, email, password, repeatPassword }, [avatar])
         .then(result => {
             if(result.errors) setError([true, result.errors[0].message]);
             else if(result.error) setError([true, result.message]);
@@ -43,6 +44,7 @@ export default function Registration({ navigation }) {
                 <Text style={styles.title}>Регистрация</Text>
                 <LoadAvatar value={require('../assets/defaultAvatar.png')} setValue={setAvatar} />
                 <Input value={username} setValue={setUsername} placeholder='Имя пользователя' />
+                <Input value={email} setValue={setEmail} placeholder='Электронная почта' />
                 <InputPassword value={password} setValue={setPassword} placeholder='Пароль' />
                 <InputPassword value={repeatPassword} setValue={setRepeatPassword} placeholder='Повторите пароль' />
                 <Button title='Зарегистрироваться' onClick={reg} />

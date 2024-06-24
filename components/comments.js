@@ -43,7 +43,7 @@ export default function Comments(props) {
 
     return(
         <SafeAreaView style={styles.safe}>
-        <BlurView style={styles.wrapper} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+        <BlurView style={styles.wrapper} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
             <Pressable style={styles.close_wrapper} onPress={close}>
                 <Image style={styles.close} source={require('../assets/cross.png')} />
             </Pressable>
@@ -67,7 +67,7 @@ export default function Comments(props) {
             </View>
 
             {showFiles &&
-            <BlurView style={styles.files} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.files} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 <ImageInput setValue={setCommFiles} />
             </BlurView>}
         </BlurView>

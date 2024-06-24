@@ -90,7 +90,7 @@ export default function FriendsList({ navigation }) {
                 }
             />
 
-            <BlurView style={styles.navigation} experimentalBlurMethod='dimezisBlurView' tint='dark' intensity={20}>
+            <BlurView style={styles.navigation} experimentalBlurMethod='dimezisBlurView' tint='systemMaterialDark' intensity={80}>
                 <Pressable style={{ height: 45 }} onPress={() => setSelectNav('friends')}>
                     <Text style={[styles.nav_text, selectNav == 'friends' ? { borderBottomWidth: 2 } : {}]}>Друзья</Text>
                 </Pressable>
