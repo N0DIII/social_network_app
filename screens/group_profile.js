@@ -13,6 +13,7 @@ import Post from '../components/post';
 import ChangeGroupData from '../components/change_groupdata';
 import GroupMembers from '../components/group_members';
 import CreatePost from '../components/create_post';
+import Comments from '../components/comments';
 
 export default function GroupProfile({ route, navigation }) {
     const { id } = route.params;
@@ -25,6 +26,8 @@ export default function GroupProfile({ route, navigation }) {
     const [search, setSearch] = useState('');
     const [showAddPost, setShowAddPost] = useState(false);
     const [posts, setPosts] = useState(null);
+    const [showComments, setShowComments] = useState(false);
+    const [postId, setPostId] = useState();
 
     const [count, setCount] = useState(0);
     const [maxCount, setMaxCount] = useState(1);
@@ -145,7 +148,7 @@ export default function GroupProfile({ route, navigation }) {
                         </View>
                     </View>
                 }
-                renderItem={({ item }) => <Post post={item} navigation={navigation} />}
+                renderItem={({ item }) => <Post post={item} setShowComments={setShowComments} setPostId={setPostId} />}
                 ListEmptyComponent={() => <View style={{ alignItems: 'center', marginVertical: 50 }}><Text style={{ color: '#949AAF', fontStyle: 'italic', fontSize: 18 }}>Нет результатов</Text></View>}
                 onEndReachedThreshold={0.25}
                 onEndReached={scroll}
@@ -172,6 +175,12 @@ export default function GroupProfile({ route, navigation }) {
                 close={() => setShowAddPost(false)}
                 type='group'
                 id={id}
+            />}
+
+            {showComments &&
+            <Comments
+                close={() => setShowComments(false)}
+                postId={postId}
             />}
 
         </SafeAreaView>

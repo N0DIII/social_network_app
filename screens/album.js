@@ -81,7 +81,7 @@ export default function Album({ route, navigation }) {
                 style={styles.photo_wrapper}
                 contentContainerStyle={{ paddingVertical: 50, alignItems: 'center', gap: 10 }}
                 data={photos}
-                keyExtractor={item => item}
+                keyExtractor={item => item.src}
                 numColumns={2}
                 renderItem={({ item }) => 
                     <View>

@@ -11,6 +11,7 @@ import Button from '../components/button';
 import Search from '../components/search';
 import Post from '../components/post';
 import AlbumList from '../components/albumlist';
+import Comments from '../components/comments';
 
 export default function UserProfile({ route, navigation }) {
     const { id } = route.params;
@@ -22,6 +23,8 @@ export default function UserProfile({ route, navigation }) {
     
     const [search, setSearch] = useState('');
     const [posts, setPosts] = useState(null);
+    const [showComments, setShowComments] = useState(false);
+    const [postId, setPostId] = useState();
 
     const [count, setCount] = useState(0);
     const [maxCount, setMaxCount] = useState(1);
@@ -154,13 +157,19 @@ export default function UserProfile({ route, navigation }) {
                         <Text style={styles.title}>Посты</Text>
                     </View>
                 }
-                renderItem={({ item }) => <Post post={item} navigation={navigation} />}
+                renderItem={({ item }) => <Post post={item} setShowComments={setShowComments} setPostId={setPostId} />}
                 ListEmptyComponent={() => <View style={{ alignItems: 'center', marginVertical: 50 }}><Text style={{ color: '#949AAF', fontStyle: 'italic', fontSize: 18 }}>Нет результатов</Text></View>}
                 onEndReachedThreshold={0.25}
                 onEndReached={scroll}
             />
 
             <Search setValue={setSearch} icon={true} asset='back' onClick={() => navigation.navigate('friends_list')} />
+
+            {showComments &&
+            <Comments
+                close={() => setShowComments(false)}
+                postId={postId}
+            />}
 
         </SafeAreaView>
     )
